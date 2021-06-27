@@ -6,6 +6,7 @@ const cTable = require('console.table');
 //imports 
 const db = require('./db');
 const { viewDept, addDept, deleteDept, viewRole, addRole, deleteRole, updateRole, viewEmp, addEmp, deleteEmp, viewEmpByMgr, viewEmpByDept, viewMgr, updateMgr } = require('./db');
+const { exit, title } = require('process');
 
 //initialize 
 init(); 
@@ -93,25 +94,175 @@ init();
          );
          switch(action) {
              //departments
-             case 'VIEW_ALL_DEPT': return viewDept(); 
-             case 'ADD_NEW_DEPT': return addDept(); 
-             case 'DELETE_DEPT': return deleteDept(); 
-             case 'VIEW_ALL_ROLES': return viewRole(); 
-             case 'ADD_NEW_ROLE': return addRole(); 
-             case 'DELETE_ROLE': return deleteRole(); 
-             case 'UPDATE_ROLE': return updateRole(); 
-             case 'VIEW_EMP': return viewEmp(); 
-             case 'ADD_EMP': return addEmp(); 
-             case 'DELETE_EMP': return deleteEmp(); 
-             case 'VIEW_EMP_BY_MGR': return viewEmpByMgr(); 
-             case 'VIEW_EMP_BY_DEPT': return viewEmpByDept(); 
-             case 'VIEW_MGR': return viewMgr(); 
-             case 'UPDATE_MGR': return updateMgr(); 
+             case 'VIEW_ALL_DEPT': return showDept(); 
+             case 'ADD_NEW_DEPT': return createDept(); 
+             case 'DELETE_DEPT': return removeDept(); 
+             case 'VIEW_ALL_ROLES': return showRole(); 
+             case 'ADD_NEW_ROLE': return createRole(); 
+             case 'DELETE_ROLE': return removeRole(); 
+             case 'UPDATE_ROLE': return editRole(); 
+             case 'VIEW_EMP': return showEmp(); 
+             case 'ADD_EMP': return createEmp(); 
+             case 'DELETE_EMP': return removeEmp(); 
+             case 'VIEW_EMP_BY_MGR': return showEmpByMgr(); 
+             case 'VIEW_EMP_BY_DEPT': return showEmpByDept(); 
+             case 'VIEW_MGR': return showMgr(); 
+             case 'UPDATE_MGR': return editMgr();
+             default: return exit();  
             //  case 'VIEW_BUDGET': return viewBudget(); 
          }
      } catch (err) {
-        console.error(error); 
+        console.error(err); 
      }
      }
+//view=show, add=create, delete=remove, update=edit
+//don't forget try/catch blocks!!!
+async function showDept() {
+    try{
+        const departments = await db.viewDept();
+        console.log("\n"); 
+        console.table(departments);
+        startMenu();  
+    } catch (err) {
+        console.error(err); 
+    }
+}
 
+async function createDept() {
+  try {
+      const department = await prompt([
+          {
+              name: 'Enter the name of the department'
+          }
+      ]); 
+      await db.addDept(department); 
+      console.log(`Added ${department.name} to the database`); 
+      startMenu(); 
+  } catch (err) {
+      console.error(err); 
+  }
+}
 
+async function removeDept() {
+    try {
+        const departments = await db.viewDept(); 
+        const deptChoices = departments.map( ({id, name}) => ({
+            name: name, 
+            value: id
+        })); 
+        const { departmentId } = await prompt([
+            {
+                type: 'list', 
+                name: 'departmentId', 
+                message: 'select the department to remove: this will remove all associated roles and employees if you proceed', 
+                choices: deptChoices
+            }
+        ]); 
+        await db.deleteDept(departmentId); 
+        console.log('Removed from database'); 
+        startMenu(); 
+    } catch (err) {
+        console.error(err); 
+    }
+}
+
+async function showRole() {
+    try {
+        const roles = await db.viewRole(); 
+        console.log('\n'); 
+        console.table(roles); 
+        startMenu(); 
+    } catch (err) {
+        console.error(err); 
+    }
+}
+
+async function createRole() {
+    try {
+        const departments = await db.addRole(); 
+        const deptChoices = departments.map( ({id, name}) => ({
+            name: name, 
+            value: id
+        })); 
+        const role = await prompt([
+            {
+                name: 'title', 
+                message: 'Enter the  name of the role'
+            }, 
+            {
+                name: 'salary', 
+                message: 'Enter the salary for this role'
+            }, 
+            {
+                type: 'list', 
+                name: 'dept_id', 
+                message: 'Select the department this role belongs to', 
+                choices: deptChoices
+            }
+        ]); 
+        await db.addRole(role); 
+        console.log(`Added ${role.title} et al to the database`); 
+        startMenu(); 
+    } catch (err) {
+        console.error(err); 
+    }
+}
+
+async function removeRole() {
+    try {
+        const roles = await db.viewRole(); 
+        const roleChoices = roles.map( ({id, title}) => ({
+            name: title, 
+        value: id
+         })); 
+         const { roleId } = await prompt([
+             {
+                 type: 'list', 
+                 name: 'roleId', 
+                 message: 'Select the role to remove: this will remove all employees in this role if you proceed', 
+                 choices: roleChoices
+             }
+         ]); 
+         await db.deleteRole(roleId); 
+         console.log('Removed from database'); 
+         startMenu(); 
+    } catch (err) {
+        console.error(err); 
+    }
+}
+
+async function editRole() {
+    try {
+        const employees = await db.viewEmp(); 
+        const empChoices = employees.map( ({id, first_name, last_name}) => ({
+          name: `${first_name} ${last_name}`, 
+          value: id  
+        })); 
+        const { employeeId } = await prompt([
+            {
+                type: 'list', 
+                name: 'employeeId', 
+                message: 'Select role to update', 
+                choices: empChoices
+            }
+        ]); 
+        const roles = await db.viewRole(); 
+        const roleChoices = roles.map( ({id, title}) => ({
+            name:title, 
+            value: id
+        })); 
+        const { roleId } = await prompt([
+            {
+                type: 'list', 
+                name: 'roleId', 
+                message: 'Select the role to assign to employee', 
+                choices: roleChoices
+            }
+        ]); 
+        await db.updateRole(employeeId, roleId);
+        console.log('Role Updated'); 
+        startMenu();  
+    } catch (err) {
+        console.error(err); 
+    }
+}
