@@ -1,0 +1,30 @@
+{
+  "name": "taskforceone",
+  "version": "1.0.0",
+  "description": "employee management system",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MarthaPotts/TaskForceOne.git"
+  },
+  "keywords": [
+    "employee",
+    "management",
+    "small",
+    "business"
+  ],
+  "author": "Martha Potts",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MarthaPotts/TaskForceOne/issues"
+  },
+  "homepage": "https://github.com/MarthaPotts/TaskForceOne#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^8.1.1",
+    "mysql": "^2.18.1"
+  }
+}
