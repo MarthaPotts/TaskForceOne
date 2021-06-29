@@ -341,7 +341,7 @@ async function removeEmp() {
     }
 }
 //function 
-function showEmpByMgr() {
+async function showEmpByMgr() {
     try {
         const managers = await db.viewEmp(); 
         const mgrChoices = managers.map( ({id, first_name, last_name}) => ({
