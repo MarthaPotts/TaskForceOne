@@ -1,0 +1,6 @@
+0 row(s) affected, 1 warning(s): 1681 UNSIGNED for decimal and floating point data types is deprecated and support for it will be removed in a future release.
+Error Code: 1452. Cannot add or update a child row: a foreign key constraint fails (`employees_db`.`employee`, CONSTRAINT `fk_mgr` FOREIGN KEY (`mgr_id`) REFERENCES `employee` (`id`) ON DELETE SET NULL)
+Error Code: 1452. Cannot add or update a child row: a foreign key constraint fails (`employees_db`.`employee`, CONSTRAINT `fk_mgr` FOREIGN KEY (`mgr_id`) REFERENCES `employee` (`id`) ON DELETE SET NULL)
+
+
+Error Code: 1452. Cannot add or update a child row: a foreign key constraint fails (`employees_db`.`employee`, CONSTRAINT `fk_mgr` FOREIGN KEY (`mgr_id`) REFERENCES `employee` (`id`) ON DELETE SET NULL)

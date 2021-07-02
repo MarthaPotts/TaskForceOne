@@ -1,6 +1,7 @@
 //dependencies 
 const mysql = require('mysql'); 
-const inquirer = require('inquirer'); 
+const inquirer = require('inquirer');
+// const { prompt } = require('inquirer');  
 const cTable = require('console.table'); 
 
 //imports 
@@ -22,7 +23,7 @@ init();
                  {
                      name: 'action', 
                      type: 'list', 
-                     message: 'choose from the followiing:', 
+                     message: 'choose from the following:', 
                      choices: [
                          {
                              name: 'View all Departments', 
@@ -72,18 +73,12 @@ init();
                              name: 'View Employee by Department', 
                              value: 'VIEW_EMP_BY_DEPT', 
                          }, 
-                        //  {
-                        //      name: 'View Manager(s)', 
-                        //      value: 'VIEW_MGR', 
-                        //  }, 
+                      
                          {
                              name: 'Update Manager(s)', 
                              value: 'UPDATE_MGR', 
                          }, 
-                        //  {
-                        //      name: 'View Total Department Budget', 
-                        //      value: 'VIEW_BUDGET',
-                        //  }, 
+                        
                          {
                              name: 'exitProgram', 
                              value: 'EXIT', 
@@ -93,22 +88,25 @@ init();
              ]
          );
          switch(action) {
-             //departments
-             case 'VIEW_ALL_DEPT': return showDept(); 
+             //dept
+             case 'VIEW_ALL_DEPT': return showDept().then(startMenu()); 
              case 'ADD_NEW_DEPT': return createDept(); 
              case 'DELETE_DEPT': return removeDept(); 
-             case 'VIEW_ALL_ROLES': return showRole(); 
+             //role
+             case 'VIEW_ALL_ROLES': return showRole().then(startMenu()); 
              case 'ADD_NEW_ROLE': return createRole(); 
              case 'DELETE_ROLE': return removeRole(); 
-             case 'UPDATE_ROLE': return editRole(); 
-             case 'VIEW_EMP': return showEmp(); 
+             case 'UPDATE_ROLE': return editRole();
+             //emp 
+             case 'VIEW_EMP': return showEmp().then(startMenu()); 
              case 'ADD_EMP': return createEmp(); 
-             case 'DELETE_EMP': return removeEmp(); 
-             case 'VIEW_EMP_BY_MGR': return showEmpByMgr(); 
-             case 'VIEW_EMP_BY_DEPT': return showEmpByDept(); 
-            //  case 'VIEW_MGR': return showMgr(); 
+             case 'DELETE_EMP': return removeEmp();
+             // 
+             case 'VIEW_EMP_BY_MGR': return showEmpByMgr().then(startMenu()); 
+             case 'VIEW_EMP_BY_DEPT': return showEmpByDept().then(startMenu()); 
+            
              case 'UPDATE_MGR': return editMgr(); 
-            //  case 'VIEW_BUDGET': return viewBudget();
+    
             default: return exitProgram();  
          }
      } catch (err) {
@@ -121,15 +119,17 @@ async function showDept() {
         const departments = await db.viewDept();
         console.log("\n"); 
         console.table(departments);
-        startMenu();  
+      
     } catch (err) {
         console.error(err); 
     }
+   
 }
+
 //function 
 async function createDept() {
   try {
-      const department = await prompt([
+      const department = await inquirer.prompt([
           {
               name: 'Enter the name of the department'
           }
@@ -149,7 +149,7 @@ async function removeDept() {
             name: name, 
             value: id
         })); 
-        const { departmentId } = await prompt([
+        const { departmentId } = await inquirer.prompt([
             {
                 type: 'list', 
                 name: 'departmentId', 
@@ -170,7 +170,7 @@ async function showRole() {
         const roles = await db.viewRole(); 
         console.log('\n'); 
         console.table(roles); 
-        startMenu(); 
+        
     } catch (err) {
         console.error(err); 
     }
@@ -183,14 +183,16 @@ async function createRole() {
             name: name, 
             value: id
         })); 
-        const role = await prompt([
+        const role = await inquirer.prompt([
             {
                 name: 'title', 
-                message: 'Enter the  name of the role'
+                message: 'Enter the  name of the role',
+                type: 'input'
             }, 
             {
                 name: 'salary', 
-                message: 'Enter the salary for this role'
+                message: 'Enter the salary for this role',
+                type: "input"
             }, 
             {
                 type: 'list', 
@@ -214,7 +216,7 @@ async function removeRole() {
             name: title, 
         value: id
          })); 
-         const { roleId } = await prompt([
+         const { roleId } = await inquirer.prompt([
              {
                  type: 'list', 
                  name: 'roleId', 
@@ -237,11 +239,11 @@ async function editRole() {
           name: `${first_name} ${last_name}`, 
           value: id  
         })); 
-        const { employeeId } = await prompt([
+        const { employeeId } = await inquirer.prompt([
             {
                 type: 'list', 
                 name: 'employeeId', 
-                message: 'Select role to update', 
+                message: 'Select employee to update', 
                 choices: empChoices
             }
         ]); 
@@ -250,7 +252,7 @@ async function editRole() {
             name:title, 
             value: id
         })); 
-        const { roleId } = await prompt([
+        const { roleId } = await inquirer.prompt([
             {
                 type: 'list', 
                 name: 'roleId', 
@@ -269,29 +271,36 @@ async function editRole() {
 async function showEmp() {
     try {
         const employees = await db.viewEmp(); 
+
         console.log('\n'); 
         console.table(employees); 
-        startMenu(); 
+
+        
     } catch (err) {
         console.error(err); 
     }
+
 }
 //function 
 async function createEmp() {
     try {
         const roles = await db.viewRole(); 
         const employees = await db.viewEmp(); 
-        const employee = await prompt([
+        const employee = await inquirer.prompt([
             {
                 name: 'first_name',
                 message: "Enter the employee's first name",  
+            },
+            {
+                name: 'last_name',
+                message: "Enter the employee's last name"
             }
         ]); 
         const roleChoices = roles.map( ({id, title}) => ({
             name: title, 
             value: id
         })); 
-        const { roleId } = await prompt({
+        const { roleId } = await inquirer.prompt({
             type: 'list', 
             name: 'roleId', 
             message: "Select the new employee's role", 
@@ -303,7 +312,7 @@ async function createEmp() {
             value: id
         })); 
         mgrChoices.unshift({name: "none", value: null}); 
-        const { managerId } = await prompt({
+        const { managerId } = await inquirer.prompt({
             type: 'list', 
             name: 'managerId', 
             message: "Select the new employee's manager", 
@@ -325,7 +334,7 @@ async function removeEmp() {
             name: `${first_name} ${last_name}`,
             value: id
         })); 
-        const { employeeId } = await prompt([
+        const { employeeId } = await inquirer.prompt([
             {
                 type: 'list', 
                 name: 'employeeId', 
@@ -348,7 +357,7 @@ async function showEmpByMgr() {
             name: `${first_name} ${last_name}`, 
             value: id
         })); 
-        const { managerId } = await prompt([
+        const { managerId } = await inquirer.prompt([
             {
                 type: 'list', 
                 name: 'managerId', 
@@ -363,7 +372,7 @@ async function showEmpByMgr() {
         } else {
             console.table(employees); 
         }
-        startMenu(); 
+        
     } catch (err) {
         console.error(err); 
     }
@@ -376,7 +385,7 @@ async function showEmpByDept() {
             name: name, 
             value: id
         })); 
-        const { departmentId } = await prompt([
+        const { departmentId } = await inquirer.prompt([
             {
                 type: 'list', 
                 name: 'departmentId', 
@@ -387,20 +396,12 @@ async function showEmpByDept() {
         const employees = await db.viewEmpByDept(departmentId); 
         console.log('\n'); 
         console.table(employees); 
-        startMenu(); 
+       
     } catch (err) {
         console.error(err); 
     }
 }
-//function 
-// async function showMgr() {
-//     try {
 
-//     } catch (err) {
-//         console.error(err); 
-//     }
-// }
-//function 
 async function editMgr() {
     try {
         const employees = await db.viewEmp(); 
@@ -408,7 +409,7 @@ async function editMgr() {
             name: `${first_name} ${last_name}`, 
             value: id
         })); 
-        const { employeeId } = await prompt([
+        const { employeeId } = await inquirer.prompt([
             {
                 type: 'list', 
                 name: 'employeeId', 
@@ -421,7 +422,7 @@ async function editMgr() {
             name: `${first_name} ${last_name}`, 
             value: id
         })); 
-        const { managerId } = await prompt([
+        const { managerId } = await inquirer.prompt([
             {
                 type: 'list', 
                 name: 'managerId', 
@@ -430,21 +431,13 @@ async function editMgr() {
             }
         ]); 
         await db.updateMgr(employeeId, managerId); 
-        console.log('Update in database'); 
+        console.log('Updated in database'); 
         startMenu(); 
     } catch (err) {
         console.error(err); 
     }
 }
-//function 
-// async function showBudget() {
-//     try {
 
-//     } catch (err) {
-//         console.error(err); 
-//     }
-// }
-//function 
 function exitProgram() {
     console.log('When there is no wind, row. Good-Bye!'); 
     process.exit(); 

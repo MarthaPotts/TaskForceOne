@@ -5,7 +5,7 @@ USE employees_db;
 -- main
 CREATE TABLE department (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
-    name VARCHAR(30) UNIQUE NOT NULL, 
+    name VARCHAR(30) UNIQUE NOT NULL 
 ); 
 -- extended A
 CREATE TABLE `role` (
@@ -23,7 +23,7 @@ CREATE TABLE employee (
     last_name VARCHAR(30) NOT NULL, 
     role_id INT UNSIGNED NOT NULL, 
     INDEX role_ind (role_id), 
-    CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE,
+    CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES `role`(id) ON DELETE CASCADE,
     mgr_id INT UNSIGNED, 
     INDEX man_ind (mgr_id), 
     CONSTRAINT fk_mgr FOREIGN KEY (mgr_id) REFERENCES employee(id) ON DELETE SET NULL
