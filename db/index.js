@@ -17,9 +17,9 @@ class Sqlconnection {
         ); 
     }
     //dept
-    addDept() {
+    addDept(department) {
         return this.connection.query(
-          "INSERT INTO department SET ?;", department  
+          "INSERT INTO department SET name=?;", department  
         );
     }
     viewDept() {
@@ -79,9 +79,7 @@ class Sqlconnection {
             departmentId
         ); 
     }
-    // updateEmp() {
-    //     return this.connection.query()
-    // }
+    
     deleteEmp(employeeId) {
         return this.connection.query(
             "DELETE FROM employee WHERE id = ?;", employeeId

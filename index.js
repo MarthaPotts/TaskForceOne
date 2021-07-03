@@ -131,11 +131,12 @@ async function createDept() {
   try {
       const department = await inquirer.prompt([
           {
-              name: 'Enter the name of the department'
+              message: 'Enter the name of the department',
+              name: "dept_name"
           }
       ]); 
-      await db.addDept(department); 
-      console.log(`Added ${department.name} to the database`); 
+      await db.addDept(department.dept_name); 
+      console.log(`Added ${department.dept_name} to the database`); 
       startMenu(); 
   } catch (err) {
       console.error(err); 
@@ -178,7 +179,7 @@ async function showRole() {
 //function 
 async function createRole() {
     try {
-        const departments = await db.addRole(); 
+        const departments = await db.viewDept(); 
         const deptChoices = departments.map( ({id, name}) => ({
             name: name, 
             value: id
